@@ -8,7 +8,7 @@
 
     <link rel="stylesheet" type="text/css" media="screen" href="../../stylesheets/stylesheet.css">
 
-    <title>coServ 開發者手冊：</title>
+    <title>coServ 開發者手冊</title>
   </head>
 
   <body>
@@ -16,10 +16,11 @@
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
+          <!--
           <a id="forkme_banner" href="https://github.com/coimotion">View on GitHub</a>
-
-          <h1 id="project_title">Coimotion.github.io</h1>
-          <h2 id="project_tagline"></h2>
+          -->
+          <h1 id="project_title">coServ 開發者手冊</h1>
+          <h2 id="project_tagline">開箱文</h2>
 
         </header>
     </div>
@@ -27,38 +28,61 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <h3>
-<a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
+        <h3>歡迎使用 coServ 這個新式的 Web Server</h3>
 
-<p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
+<p>不論是只有幾個靜態網頁的簡易網站，到能夠整合資料庫、甚至數個網站的複雜的網路應用，coServ 都能幫助您快速而有效的達成。
+    不想花這麼多時間學習 Express.js，而希望能直接進入網站開發的工作嗎？那麼使用 coServ 將會使你感到無比的成就感。
+</p>
+<p>&nbsp;</p>
 
-<pre><code>$ cd your_repo_root/repo_name
-$ git fetch origin
-$ git checkout gh-pages
+<h3>立刻動手</h3>
+
+<p>假設您已安裝了 node.js，接下來就是安裝 coServ:</p>
+<pre><code> &gt; npm install coserv</code></pre>
+
+<p>完成安裝後您會看到 coServ 的目錄。請進入到 coServ 目錄後執行以下的命令：</p>
+<pre><code> &gt;  node cli/addSite.js hello</code></pre>
+
+<p>這將會幫您建立一個稱為 'hello' 的網站，並且把它設為 coServ 的預設網站。這時您只需啟動 coServ，然後到網路瀏覽器上輸入
+    <code>http://127.0.0.1:8080</code>的網址，就會看到 'hello' 這個測試網站的首頁。以下是啟動 coServ 的命令：</p>
+<pre><code> &gt;  node coServ.js</code></pre>
+
+<p>&nbsp;</p>
+
+
+<h3>小小的測試</h3>
+
+<p>接下來我們要做一些簡單的測試，以便熟悉如何建立自己的網站。首先請用您所熟悉的編輯器開啟 'www/themes/hello/blocks/views/index/index.html' 這個檔案。
+    檔案中只有一行 HTML，我們可以再加一行讓檔案如以下所示：
+</p>
+<pre><code>&lt;h2&gt;Hello World!&lt;/h2&gt;
+&lt;div&gt;這個網頁的路徑是：<%=bi.uri%>&lt;/div&gt;
 </code></pre>
+<p>這時讓瀏覽器更新畫面，您會發現畫面上多了一行資訊。到目前為止，你會發現用 coServ 建立網站就好像用 PHP 一樣簡單。以後您還會發現用 coServ 架站更容易開發和維護。
+現在讓我們再多做一些變化，以便更熟悉 coServ。</p>
+<p>&nbsp;</p>
 
-<p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+<h3>新增一個頁面</h3>
 
-<h3>
-<a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
+<p>除了原有的 index.html 外，現在讓我們加上第二個網頁叫 count.html。這個新增的網頁必須放在 'www/themes/hello/blocks/views/count' 底下，
+    同時要在 'www/themes/hello/siteURI.json' 這個檔案中為這個新增的網頁加上一筆記錄。手動做這些動作有點麻煩，還好 coServ 提供了一些工具可以讓事情簡化一點。
+    如果我們要為 hello 這個網站新增一個 count 的網頁，執行以下的命令即可：</p>
+<pre><code>&gt; node cli/addPage.js hello count</code></pre>
+<p>這時 addPage.js 會為我們新增一個 'www/themes/hello/blocks/views/count/count.html' 的檔案，並在 'www/themes/hello/siteURI.json' 這個檔案中新增一筆記錄。
+    有興趣的朋友可以去檢查這些變化。接下來，我們可以開始為這個新增的頁面加上一些內容。內容很簡單，只是印出 1 ~ 10 這十個數字。如果您想做做其他的事，請盡量去嘗試。
+    以下所提供的只是一個範例：</p>
+<pre><code>&lt;div&gt;以下列出1 ~ 10 的數字：&lt;/div&gt;
+&lt;div&gt;
+    <% for (var i = 1; i <= 10; i++)  { %>
+        <%= i %>&amp;nbsp;
+    <% } %>
+&lt;/div&gt;
+</code></pre>
+<p>將以上的內容複製到 count.html 這個檔案後，再到網路瀏覽器輸入<code>127.0.0.1:8080/count</code>，就能看到新頁面的內容。</p>
+<p>以上的範例示範了如何產生一些動態的內容。雖然是簡單的示範，但已說明如何利用 template 來協助產生網頁。不過這只展示了 coServ 大概 1% 的功能。
+    更強大的功能，我們將陸續介紹，就請大家耐心的往下看吧！</p>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
-
-<h3>
-<a name="rather-drive-stick" class="anchor" href="#rather-drive-stick"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
-
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
-
-<h3>
-<a name="authors-and-contributors" class="anchor" href="#authors-and-contributors"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
-
-<p>You can <a href="https://github.com/blog/821" class="user-mention">@mention</a> a GitHub username to generate a link to their profile. The resulting <code>&lt;a&gt;</code> element will link to the contributor's GitHub Profile. For example: In 2007, Chris Wanstrath (<a href="https://github.com/defunkt" class="user-mention">@defunkt</a>), PJ Hyett (<a href="https://github.com/pjhyett" class="user-mention">@pjhyett</a>), and Tom Preston-Werner (<a href="https://github.com/mojombo" class="user-mention">@mojombo</a>) founded GitHub.</p>
-
-<h3>
-<a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
-
-<p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
+</section>
     </div>
 
     <!-- FOOTER  -->

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Coimotion.github.io : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="../../stylesheets/stylesheet.css">
+
+    <title>coServ 開發者手冊: coServ 的設計美學</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <!--
+          <a id="forkme_banner" href="https://github.com/coimotion">View on GitHub</a>
+          -->
+          <h1 id="project_title">coServ 開發者手冊</h1>
+          <h2 id="project_tagline">coServ 的設計美學</h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>Page, Regions and Blocks</h3>
+
+<p>網頁、區域和區塊是 coServ 用來解決網頁設計繁複又容易出錯的方法。將一個完整的網頁解構成區域和區塊，讓開發者能專注於較小的面積。
+「區域」像是一個容器，可以在裡面放置子區域或是區塊。以 MVC 架構來說，區域只有 view 的部份。</p>
+<p>「區塊」也是網頁中一個較小的區域，但與區域不同的是區塊還具有 MVC 架構中資料內容（model）與互動控制（control）的部份。
+一個典型的區塊可能會從資料庫或檔案、或是COIMOTION API service中讀取資料，然後將結果以 HTML 的格式輸出。</p>
+
+<p>所以一個網頁可以把它當作有如這樣的結構： page --&gt; regions --&gt; blocks</p>
+<p>&nbsp;</p>
+
+<h3>組合網頁</h3>
+
+<p>在 coServ 上，網頁是組合起來的，開發者不需要自己用程式去把網頁的每個部分串起來。建議的作法是先建立頁型，把網頁區分成幾個主要的區域。
+在每個區域中，再填入所需要的內容（區塊）。這裡舉個例來說明。假設你要建置一個「最新消息」的網頁，網頁的左邊有最新消息的列表，網頁的主文區則是某篇消息的詳細內容。
+在 coServ 上，你可以這麼處理：</p>
+<pre><code>          +----------------------------------+
+          | +------------------------------+ |
+          | |         Head Region          | |
+          | +------------------------------+ |
+          | +---+  +-----------------------+ |
+          | | L |  |                       | |
+          | | e |  |                       | |
+          | | f |  |                       | |
+          | | t |  |         Main          | |
+          | |   |  |                       | |
+          | | R |  |        Region         | |
+          | | e |  |                       | |
+          | | g |  |                       | |
+          | | i |  |                       | |
+          | | o |  |                       | |
+          | | n |  |                       | |
+          | +---+  +-----------------------+ |
+          +----------------------------------+</code></pre>
+
+<p>也就是設計一個頁型，把網頁切成三個主要的區域。接著假設你已有二個區塊 'news/list' 和 'news/view'。
+'news/list' 區塊會從資料來源（資料庫、COIMOTION）讀取最新消息的清單，並以 HTML 製作成列表的形式。
+'news/view' 區塊則能夠將某一則最新消息的詳細內容取出並加以顯示。那麼利用上面展示的頁型，把 'news/list' 區塊放到左邊的區域（left region），
+把 'news/view' 放進主區域（main region）中，你就已產生一個最新消息的頁面了。
+</p>
+<p>這個模式有趣的地方在於你可以重複利用相同的方法，去產生內容完全不同的網頁，而你完全不需要再去處理網頁編排的問題。
+例如你可以將部落格清單放在左區域，部落格本文放在主區域中，你就生成了一個部落格的網頁。把產品清單放在左區域，產品內容說明放在主區域，你又可以生成一個產品網頁。
+如此一來你只需專注於方塊內容的產製，而不需為不同的內容一再的去處理網頁版面編排的問題。</p>
+<p>這種「重複使用」的模式也可以套用在區域和區塊上，讓你的網站設計工作更進一步的簡化。以下讓我們來說明如何做到這點。</p>
+
+<p>&nbsp;</p>
+
+<h3>來一段程式碼吧</h3>
+
+<p>讓我們用 coServ 下載套件中所附的範例來說明。先找到位於 'www/themes/index/layout/default/page.html' 的預設頁型檔。
+這個頁型檔建構了示範網站中所有網頁的基本框架。</p>
+
+<p>以上完成了 coServ 檔案結構的介紹。大家可以發現雖然功能很強大，但經過適當的分類整理，並不會覺得複雜。接下來我們就要談最有趣的部份：coServ 的設計美學。</p>
+
+</section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+
+  </body>
+</html>
