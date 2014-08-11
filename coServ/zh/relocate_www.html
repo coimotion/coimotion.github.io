@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Coimotion.github.io : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="../../stylesheets/stylesheet.css">
+
+    <title>coServ 開發者手冊</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <!--
+          <a id="forkme_banner" href="https://github.com/coimotion">View on GitHub</a>
+          -->
+          <h1 id="project_title">coServ 開發者手冊</h1>
+          <h2 id="project_tagline">可重定位的 WWW 目錄</h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>WWW 目錄包含了所有的網站設計內容</h3>
+
+<p>不論你有多少網站或是網路應用程式同時在 coServ 上跑，還記得所有相關的檔案都是放在 'www' 這個目錄底下嗎？
+藉著將所有網站相關的目錄放在同一個根目錄下，一方面可以在網站管理時不必到處找檔，還有避免網站設計內容和 coServ 
+的程式互相摻雜在一起的好處。這一切似乎都很美好... 直到你需要更新 coServ 到新版時，你會突然發現一個問題。
+</p>
+<p>什們問題呢？當你用 npm 更新 coServ 時，你有可能將原有的網站設計內容覆寫掉。此外，在 production 時，將網站的資料放在
+coServ 模組之下也不是一個好注意。不過沒關係，0.8.9 版針對這個問題提出了解決方案。
+</p>
+<p>&nbsp;</p>
+
+<h3>可重定位的 WWW</h3>
+
+<p>經由上面的說明，我們了解到最好能將 'www' 目錄掛在任何我們想要的位置。除了能避免更版時受到影響，還能將
+'www' 目錄下的內容納入原始碼管理。所以從 0.8.9 版開始，你可以把 'www' 目錄掛在任何你想要的檔案位置，
+然後在 consif.json 檔案中告知 coServ 'www' 目錄的完整路徑。假設你的 'www' 目錄是放在
+'/users/john/websites/www' 的路徑上，那麼 config.json 檔案應該長得像以下的範例：</p>
+<pre><code>{
+    "apiEngine": {
+        "host": "coimapi.tw",
+        "port": 80,
+        "method": "POST"
+    },
+    "wwwPath": "/Users/john/websites/www"
+}</code></pre>
+
+<p>就是這麼簡單，現在你可以將 'www' 目錄移到任何你想要的位置。如果你在 coServ 上同時跑許多網站，
+你甚至可以準備一個專用的檔案系統來儲存這些網站的內容，然後 mount 到 coServ 的主機上。
+有了這個新功能，你在管理上將會多了許多的彈性。</p>
+
+
+<h3>更多文件</h3>
+<ul>
+    <li><a href="./index.html">開箱文</a></li>
+    <li><a href="./structure.html">網站的檔案結構</a></li>
+    <li><a href="./layout.html">coServ 的設計美學</a></li>
+</ul>
+
+</section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+
+  </body>
+</html>
