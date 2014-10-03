@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Coimotion.github.io : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="../../stylesheets/stylesheet.css">
+
+    <title>coServ 開發者手冊: JASS</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <!--
+          <a id="forkme_banner" href="https://github.com/coimotion">View on GitHub</a>
+          -->
+          <h1 id="project_title">coServ 開發者手冊</h1>
+          <h2 id="project_tagline">JASS: Just Awesome Style Sheet</h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h3>如果你不是 Rails 的開發者</h3>
+
+<p>有不少開發者使用 Rails 開發網站，因為 Rails 有許多有趣的概念和工具（例如 SASS）可以簡化網站開發的工作。尤其是 SASS，可以讓長得太大而失控的 CSS 被有效的管理。因為實在很好用，SASS 甚至在非 Rails 的前端開發者也流行起來。</p>
+<p>雖然 SASS 是非常棒的 CSS 設計工具，但對於不是 Rails 的開發者來說，要使用就不是那麼方便（是的，是有 Grunt 這帖解藥，但總還有一些設定的工作要做）。對於 node.js 的開發者來說，有沒有對應的方案呢？</p>
+<p>&nbsp;</p>
+
+<h3>JASS To The Rescue</h3>
+
+<p>node.js 短短幾年爆炸性的成長，幾乎要什麼功能都可以在 npmjs.org 找到了。那麼 node.js 花園裡怎麼可以沒有像 SASS 這樣的東西呢？所以我們決定要建一個 node.js 原生的 CSS 管理套件，讓 node.js 的開發者可以和 Rails 的開發者一樣快樂。這個 CSS 的管理套件必須具備以下的條件：</p>
+<ul>
+  <li>維持 CSS 原來的語法，盡量不要讓開發者還要學新的語法。</li>
+  <li>node.js 原生的實作，而且越輕便越好</li>
+  <li>如果可能的話，可不可以比 SASS 更強大？</li>
+</ul>
+
+<p>想法是這樣子的：CSS 的設定規則 (rule) 是由選擇器 (selector) 加上屬性 (property set) 所構成。而 CSS 屬性本質上就是一個 Javascript 的物件。如果能直接用 Javascript 物件來表示 CSS 屬性，那麼屬性的管理和使用將會變得非常有彈性。再加上 coServ 原本就可以用樣板 (template) 來生成 CSS 檔案。把這二件事整合起來，我們就有了一個比 SASS 還強大的 CSS 管理工具。以下就來比較 SASS 和 JASS 的功能...</p>
+<p>&nbsp;</p>
+
+<h3>JASS vs SASS</h3>
+<p>我們就根據 SASS 官網上所描述的 SASS 主要特性來做一些比較：</p>
+
+<h4>Variables (變數)</h4>
+<p>SASS 的語法</p>
+<pre><code>$font-stack:    Helvetica, sans-serif
+$primary-color: #333
+
+body
+  font: 100% $font-stack
+  color: $primary-color</code></pre>
+<p>JASS 的語法</p>
+<pre><code><%
+var  fontStack = 'Helvetica, sans-serif',
+     primaryColor = '#333'; %>
+
+body {
+  font: <%= fontStack %>;
+  color: <%= primaryColor %>;
+}</code></pre>
+
+<p>除了使用 EJS template 的語法外（&lt;% ... %&gt; 那段原始碼），基本上 JASS 維持了 CSS 的語法，沒有做任何更動。而且 JASS 的變數比 SASS 還強，上面的範例可以直接改寫成：</p>
+<pre><code><% var  fontp = {font: 'Helvetica, sans-serif', color: '#333'}; %>
+
+body {
+  <%= jass.p(fontp); %>
+}</code></pre>
+
+<p>在 EJS 中，&lt;%= 表示要將變數值或函式的傳回值印出來，而 jass.p() 這個函數則幫助我們以 CSS 的語法將 Javascript 物件印出來（不是 JSON 的輸出格式）。</p>
+<p>&nbsp;</p>
+
+<h4>Nesting (巢狀疊套)</h4>
+<p>SASS 官網舉了類似以下的範例來說明巢狀疊套:</p>
+<pre><code>nav
+  ul
+    margin: 0
+    padding: 0
+    list-style: none
+
+  li
+    display: inline-block</code></pre>
+
+<p>JASS 可用以下的方式來處理：</p>
+<pre><code><%
+  var  rTop = jass.r('nav'),
+       r_ul = jass.r('ul', {margin: 0, padding: 0, 'list-style': 'none'}),
+       r_li = jass.r('li', {display: 'inline-block'});
+  rTop.add( [r_ul, r_li] );
+%>
+<%= rTop.toString(); %>
+</code></pre>
+<p>其中 jass.r() 可以用來建立一條 CSS 規則。在上面的範例中，我們利用 jass.r() 建立了三條 CSS 規則，而且將其中 r_ul 和 r_li 二條規則附加到規則 rTop 之下。最後再將 rTop 印出，就能得到所要的結果。</p>
+<p>乍看之下 JASS 的寫法比較繁瑣。但如果 r_ul 和 r_li 有共有的屬性，那麼共有屬性可以設在 rTop 中，不必再重複：</p>
+<pre><code><%
+  var  rTop = jass.r('nav', {margin: 0}),
+       r_ul = jass.r('ul', {'list-style': 'none'}),
+       r_li = jass.r('li', {display: 'inline-block'});
+  rTop.add( [r_ul, r_li] );
+%>
+<%= rTop.toString(); %>
+</code></pre>
+<p>在上面的範例中， r_ul 和 r_li 都會繼承 rTop 的屬性（margin: 0）。</p>
+<p>&nbsp;</p>
+
+<h4>Import (匯入)</h4>
+<p>將常用的 CSS 設定另外搬到一個檔案之後再匯入到需要的場合，可以避免重複相同 CSS 設定。以下是 SASS 的處理方式：</p>
+<pre><code>@import reset</code></pre>
+
+<p>JASS 也有類似的功能：</p>
+<pre><code><% import('reset.css'); %></code></pre>
+<p>&nbsp;</p>
+
+<h4>Mixins (混用)</h4>
+<p>SASS 的 mixins 有函式的味道。以下是 SASS 官網提供的範例：</p>
+<pre><code>=border-radius($radius)
+  -webkit-border-radius: $radius
+  -moz-border-radius:    $radius
+  -ms-border-radius:     $radius
+  border-radius:         $radius
+
+.box
+  +border-radius(10px)
+</code></pre>
+<p>JASS 的寫法：</p>
+<pre><code><%
+  function borderRadius(radius)  {
+    return  {
+      '-webkit-border-radius': radius,
+      '-moz-border-radius': radius,
+      '-ms-border-radius': radius,
+      'border-radius': radius
+    };
+  };
+%>
+
+  .box { <%= jass.p( borderRadius('10px') ); %>}
+</code></pre>
+<p>因為在 JASS 中 mixins 是以函數處理，所以還可以在函數內做額外的運算（處理）。這是 SASS 做不到的。</p>
+<p>&nbsp;</p>
+
+<h4>Extend (擴充/繼承)</h4>
+<p>在 SASS 中，一條 CSS 規則可以繼承另一條 CSS 規則的屬性。以下為範例：</p>
+<pre><code>  .message
+      border: 1px solid #ccc
+      padding: 10px
+      color: #333
+
+  .success
+      @extend .message
+      border-color: green
+</code></pre>
+<p>事實上，上面的範例是在繼承 CSS 規則中的屬性而已，而不是整個 CSS 規則。JASS 將這個概念表達的更清楚：</p>
+<pre><code><%
+  var  msgProp = {
+      border: '1px solid #ccc',
+      padding: '10px',
+      color: '#333'
+  };
+%>
+
+  .message { <%= jass.p(msgProp); %> }
+  .success {
+      <%= jass.p(msgProp); %>
+      border-color: green;
+  }
+</code></pre>
+<p>&nbsp;</p>
+
+<h4>Operators (運算元)</h4>
+<p>既然 JASS 用了類似 ESJ 語法的樣板，所有的 Javascript 功能都在開發者的手中。要在 CSS 設定中叫用運算元當然就是小 case 了。</p>
+<p>&nbsp;</p>
+
+<h3>如何使用</h3>
+
+<p>coServ 從 0.9.0 版開始就會支援 JASS，主要就是在 CSS 樣板中加上 jass 這個物件的支援。因此開發者不需要做任何設定或改變。原有的 CSS 檔仍然會正常運作，但開發者可以開始用 JASS 的各項功能，把 CSS 也納入管理吧！</p>
+<p>&nbsp;</p>
+
+<h3>更多文件</h3>
+<ul>
+    <li><a href="./index.html">開箱文</a></li>
+    <li><a href="./structure.html">網站的檔案結構</a></li>
+    <li><a href="./layout.html">coServ 的設計美學</a></li>
+    <li><a href="./relocate_www.html">可重定位的 WWW 目錄</a></li>
+</ul>
+
+</section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+
+  </body>
+</html>
