@@ -30,20 +30,20 @@
       <section id="main_content" class="inner">
         <h3>如果你不是 Rails 的開發者</h3>
 
-<p>有不少開發者使用 Rails 開發網站，因為 Rails 有許多有趣的概念和工具（例如 SASS）可以簡化網站開發的工作。尤其是 SASS，可以讓長得太大而失控的 CSS 被有效的管理。因為實在很好用，SASS 甚至在非 Rails 的前端開發者也流行起來。</p>
+<p>近來有不少開發者使用 Rails 開發網站，因為 Rails 有許多有趣的概念和工具（例如 SASS）可以簡化網站開發的工作。尤其是 SASS，可以讓長得太大而失控的 CSS 被有效的管理。因為實在很好用，SASS 甚至在非 Rails 的前端開發者也流行起來。</p>
 <p>雖然 SASS 是非常棒的 CSS 設計工具，但對於不是 Rails 的開發者來說，要使用就不是那麼方便（是的，是有 Grunt 這帖解藥，但總還有一些設定的工作要做）。對於 node.js 的開發者來說，有沒有對應的方案呢？</p>
 <p>&nbsp;</p>
 
 <h3>JASS To The Rescue</h3>
 
-<p>node.js 短短幾年爆炸性的成長，幾乎要什麼功能都可以在 npmjs.org 找到了。那麼 node.js 花園裡怎麼可以沒有像 SASS 這樣的東西呢？所以我們決定要建一個 node.js 原生的 CSS 管理套件，讓 node.js 的開發者可以和 Rails 的開發者一樣快樂。這個 CSS 的管理套件必須具備以下的條件：</p>
+<p>node.js 短短幾年爆炸性的成長，幾乎要什麼功能都可以在 npmjs.org 找到了。那麼 node.js 花園裡怎麼可以沒有像 SASS 這樣的東西呢？所以我們決定要建一個 node.js 原生的 CSS 管理套件，讓 node.js 的開發者可以和 Rails 的開發者一樣歡樂。這個 CSS 的管理套件必須具備以下的條件：</p>
 <ul>
-  <li>維持 CSS 原來的語法，盡量不要讓開發者還要學新的語法。</li>
-  <li>node.js 原生的實作，而且越輕便越好</li>
+  <li>維持 CSS 原來的語法，讓任何 CSS/Javascript 開發者都能一看就懂，不必學習新的語法。</li>
+  <li>直接以 Javascript 實作，而且越輕便越好</li>
   <li>如果可能的話，可不可以比 SASS 更強大？</li>
 </ul>
 
-<p>想法是這樣子的：CSS 的設定規則 (rule) 是由選擇器 (selector) 加上屬性 (property set) 所構成。而 CSS 屬性本質上就是一個 Javascript 的物件。如果能直接用 Javascript 物件來表示 CSS 屬性，那麼屬性的管理和使用將會變得非常有彈性。再加上 coServ 原本就可以用樣板 (template) 來生成 CSS 檔案。把這二件事整合起來，我們就有了一個比 SASS 還強大的 CSS 管理工具。以下就來比較 SASS 和 JASS 的功能...</p>
+<p>想法是這樣子的：CSS 的設定規則 (rule) 是由選擇器 (selector) 加上屬性 (property set) 所構成。而 CSS 屬性本質上就是一個 Javascript 的物件。如果能直接用 Javascript 物件來表示 CSS 屬性，那麼屬性的管理和使用將會變得非常有彈性。再加上 coServ 原本就可以在 CSS 檔案中嵌入 Javascript。把這二件事整合起來，我們就有了一個比 SASS 還強大的 CSS 管理工具。以下就來比較 SASS 和 JASS 的功能...</p>
 <p>&nbsp;</p>
 
 <h3>JASS vs SASS</h3>
@@ -67,14 +67,14 @@ body {
   color: <%= primaryColor %>;
 }</code></pre>
 
-<p>除了使用 EJS template 的語法外（&lt;% ... %&gt; 那段原始碼），基本上 JASS 維持了 CSS 的語法，沒有做任何更動。而且 JASS 的變數比 SASS 還強，上面的範例可以直接改寫成：</p>
+<p>除了使用 EJS template 的語法來嵌入 Javascript 的程式碼外（&lt;% ... %&gt; 那段原始碼），基本上 JASS 維持了 CSS 的語法，沒有做任何更動。而且 JASS 的變數比 SASS 還強，上面的範例可以直接改寫成：</p>
 <pre><code><% var  fontp = {font: 'Helvetica, sans-serif', color: '#333'}; %>
 
 body {
   <%= jass.p(fontp); %>
 }</code></pre>
 
-<p>在 EJS 中，&lt;%= 表示要將變數值或函式的傳回值印出來，而 jass.p() 這個函數則幫助我們以 CSS 的語法將 Javascript 物件印出來（不是 JSON 的輸出格式）。</p>
+<p>&lt;%= 表示要將變數值或函式的回傳值印出來，而 jass.p() 這個函數則幫助我們將 Javascript 物件以 CSS 的語法印出來，而不是一般的 JSON 輸出格式。</p>
 <p>&nbsp;</p>
 
 <h4>Nesting (巢狀疊套)</h4>
@@ -98,7 +98,7 @@ body {
 <%= rTop.toString(); %>
 </code></pre>
 <p>其中 jass.r() 可以用來建立一條 CSS 規則。在上面的範例中，我們利用 jass.r() 建立了三條 CSS 規則，而且將其中 r_ul 和 r_li 二條規則附加到規則 rTop 之下。最後再將 rTop 印出，就能得到所要的結果。</p>
-<p>乍看之下 JASS 的寫法比較繁瑣。但如果 r_ul 和 r_li 有共有的屬性，那麼共有屬性可以設在 rTop 中，不必再重複：</p>
+<p>乍看之下 JASS 的寫法比較繁瑣。但事實上 JASS 可以把 CSS 規則存成一個變數，然後重複使用或再做進一步的處理，讓整個 CSS 的撰寫更有彈性。而上面的範例還有一個進階的用法：如果 r_ul 和 r_li 有共有的屬性，那麼共有屬性可以設在 rTop 中，不必再重複：</p>
 <pre><code><%
   var  rTop = jass.r('nav', {margin: 0}),
        r_ul = jass.r('ul', {'list-style': 'none'}),
