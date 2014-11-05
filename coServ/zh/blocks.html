@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Coimotion.github.io : " />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="../../stylesheets/stylesheet.css">
+
+    <title>coServ:神奇的區塊</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <!--
+          <a id="forkme_banner" href="https://github.com/coimotion">View on GitHub</a>
+          -->
+          <h1 id="project_title">coServ 開發者手冊</h1>
+          <h2 id="project_tagline">神奇的區塊</h2>
+
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+<p>歡迎來到區塊的神奇世界。一開始我們先複習一下幾個有關區塊的概念：
+  <ul>
+  <li>網頁是由區域和區塊組合而成。</li>
+  <li>區塊本身是由 MVC 所架構的一個完整的元件。一個區塊可以被重複的使用到不同的網頁中。</li>
+  <li>區塊可以被動態的嵌入到網頁中，也可以單獨被更新而不影響網頁其它的部份。</li>
+  </ul>
+  當你逐漸熟悉 coServ 後，你會發現區塊是 coServ 用來建構網頁的基礎。因此本文將解釋說明區塊的妙用。
+</p>
+<p>&nbsp;</p>
+
+<h3>MVC 設計範型</h3>
+
+<p>一個區塊最多可以由六個檔案所組成。其中一個是 node.js 的模組，用來定義或產出區塊的資料模型。有三個檔 (HTML, CSS 和多與資源套組)用來定義或顯示區塊的外觀。另外一個 Javascript 檔案（不要和 node.js 的模組檔案混淆）用來定義區塊的 controller。最後還有一個檔用來匯入區塊所特別需要的 CSS 或 Javascript 檔。除了 HTML 之外，其餘五個檔都不是必要的。
+以下將說明個別檔案的意義。
+</p>
+
+<p>HTML 和 CSS 檔事實上都是樣板，而不是靜態的檔案。樣板的好處是可以將 Javascript 程式碼嵌入到 HTML 和 CSS 中，而且可以將資料內容動態的填入 HTML 中或是利用資料內容改變 CSS 的行為。能夠以 Javascript 檢視資料內容會讓 CSS 的設定更簡潔有力。為了解釋嵌入 Javascript 對簡化 CSS 的效果，假設你要建置一個查詢天氣的 App，而這個 App 的背景圖和當時的天氣狀況有關。一般的作法是在 CSS 檔案中對不同的天氣狀況設定不同的 CSS 規則，其中每條 CSS 規則可以依據所對應的天氣狀況指定不同的背景圖。然後在 HTML 樣板中根據 data model 所傳回的天氣狀況來決定選用哪一條 CSS 規則。在 coServ 上，利用 CSS 樣板你可以不需要這麼麻煩。你可以在 CSS 樣板中定義一個 Javascript 的函式，這個函式可以根據天氣狀況傳回不同的背景圖。如此一來，我們只需在 CSS 規則中呼叫這個函式即可。以下提供 sample code 作為參考：</p>
+<pre><code>&lt;%
+  function  bgImage(weather) {
+    var imgFile;
+    if (weather === ‘cloudy’)
+        imgFile = ‘cloudy.png’;
+    else  if (weather === ‘rainy’)
+        imgFile = ‘rainy.png’;
+    else
+        imgFile = ‘clearSky.png’;
+
+    return imgFile;
+  };
+%&gt;
+
+body { 
+  background-image: &lt;%= bgImage(value.weather); %&gt;; 
+}</code></pre>
+
+<p>利用 HTML 和 CSS 樣板會讓網頁的視覺設計 (view) 變得簡單有彈性，但這只是個開端而已。coServ 的區塊在處理資料 (model) 和 controller 時有更強大的功能讓許多前端設計的問題變成只是小菜一碟。</p>
+<p>&nbsp;</p>
+
+<h3>區塊控制器</h3>
+
+<p>依循 MVC 的設計範型 (design pattern)，coServ 裡面每一個區塊都有自己的控制器 (controller)。這個控制器就是在網路瀏覽器上執行的 Javascript 程式碼。為了避免不同區塊的控制器會互相干擾（例如變數名稱、函式名稱撞名等），coServ 會自動將每個區塊的控制器封裝起來（類似node.js 將模組封裝的動作）。</p>
+
+<p>coServ 對區塊控制器並沒有什麼特別的要求，但有提供一個 startup() 的函式。如果開發者想要在區塊完全載入並顯示於網頁上之後做一些區塊的起始動作，那麼開發者可以如以下所示實作 startup() 這個函式：</p>
+<pre><code>ctrl.startup = function()  {
+  // initialize your block here
+};</code></pre>
+
+<p>因為區塊控制器是被封裝起來的，所以區塊內定義的變數和函式都只在區塊內可見，而不是整體變數或函式。如果區塊控制器的函式需要被外部所呼叫（例如從 HTML 碼叫用對應區塊控制器的函式），那麼開發者可以將對外曝光的函式名稱前加上 ctrl 的前置變數。請參考以下的範例：</p>
+<pre><code>ctrl.extFunction = function()  {
+  // 這個函式在控制器外部是可見的
+};
+
+function  intFunction()  {
+  // 這個函式只能在控制器內部被呼叫
+};</code></pre>
+
+<p>區塊控制器如果不能被外部呼叫，特別是從 HTML 中呼叫對應的控制器，那麼控制器就幾乎沒什麼作用。常見的用法是將事件處理器(event handler) 定義在區塊控制器內，然後在 HTML 中將事件的處理導引到控制器中去處理。可是如何在 HTML 中呼叫對應區塊的控制器呢？有一些情境讓這個問題不如想像中簡單。首先，一個區塊可能在同一個頁面上被引用多次。所以我們不能為區塊控制器指定固定的變數名稱，否則在單一區塊在同一頁面被多次引用時 (multiple instances)，我們將無法區分控制器。其次，區塊是可以被動態的嵌入網頁中。所以當開發者在設計 HTML 時，還無法知道動態被嵌入的區塊的控制器變數名稱。為了解決這個問題，coServ 提供了 'ctrl' 這個變數來指向對應的控制器。以下的 HTML 範例顯示了如何使用 'ctrl' 這個變數：</p>
+
+<pre><code>&lt;a href="..." onclick="&lt;%=ctrl%&gt;.doClick();">this is a link&lt;/a&gt;</code></pre>
+
+<p>除了控制器之外，區塊所使用的 CSS id 或 class name 也會有撞名的可能。例如區塊 A 中有一個名為 title 的 CSS class，而區塊 B 也有名為 title 的 CSS class。當我們把區塊 A 和 B 放在同一個頁面時，我們就有了 CSS 撞名的問題。開發者可以藉由避免相同的 CSS class name 或 id 來試圖解決這個問題，但可能會徒勞無功。一來是這樣會使 CSS 取名的過程變得非常繁瑣，我們要如何確定 CSS class name 沒有被使用過呢？更糟糕的是如果由不同的開發者甚至不同的團隊所設計的區塊要放在一起，很難找到一個真正安全的方法。事實上 CSS 撞名並不是因為區塊的概念而產生，許多大型的網站應用就一直存有 CSS 撞名的問題。</p>
+
+<p>coServ 號稱是網站應用的終極平台，對這個問題當然有好的解法。針對開發者為區塊所設計的 CSS，coServ 會自動將區塊的 CSS 加上一個額外的包覆層，用來避免 CSS 撞名的問題。至於取用時，開發者要避免在 Javascript 中使用 getElementById() 或是 jQuery 的 selector 函式。正確的呼叫方法是使用 ctrl.sel('css selector') 來取得的對應的 DOM 物件。事實上 ctrl.sel() 所取得的物件是一個 jQuery 物件，所以開發者可以套用 jQuery 於所傳回的物件之上。</p>
+<p>&nbsp;</p>
+
+
+<h3>資料模式</h3>
+
+<p>接下來我們要討論 MVC 中的資料模式 (data model)。最簡單的區塊是可以沒有資料模式的。沒有資料模式的區塊可以被稱為靜態區塊。任何要表示的內容可以直接寫在 HTML 上即可。不過這樣的區塊顯然沒有太大的彈性。有資料模式的區塊其內容可以異動，比較符合多數的應用情境。</p>
+
+<h4>本地模組</h4>
+<p>在 coServ 中每個區塊都可以選定其資料模式是來自本地模組 (local module) 或是遠地的 API 服務 (remote API services)。如果開發者要採用本地模組作為區塊的資料模式，那可以撰寫一個 node.js 的模組來達成。在這個 node.js 模組中，開發者必須實作（提供）一個名為 run() 的函式以便 coServ 呼叫。以下是一個範例：</p>
+
+<pre><code>exports.run = function(inData, callback)  {
+  var  data = {
+           thisYear: new Date().getFullYear()
+       };
+  callback( {errCode: 0, 
+             message: ‘ok’, 
+             value: data} );
+};
+</code></pre>
+<p>這個模組可以用來傳回目前的西元年到前端的 HTML 畫面中。其中 run() 所傳入的二個參數，<i>inData</i> 是一個 Javascript 物件，內含呼叫這個區塊時的參數 (query parmeters)。如果這個區塊是畫面的主區塊時，<i>inData</i>的內含將是網頁呼叫時的參數。<i>callback</i> 則是回傳函式，開發者利用 <i>callback</i> 來將執行結果傳回。值得注意的是，回傳結果的格式應仿照 API 的格式，裡面會包含三個欄位：errCode 是錯誤碼，0 表示執行成功，否則可用非 0 的整數來識別各種不同的錯誤。message 則是錯誤訊息，用來說明錯誤碼所代表的意義。value 則是真正的執行結果。</p>
+<p>實作好的本地模組，檔案要放在什麼地方呢？因為本地模組是用來實作一個區塊的資料模式 (data model)，所以其檔案是放置在與區塊相關的目錄下。在 coServ 中，每個網站樣版 (www/themes/[web_theme]) 下都有一個 blocks 的目錄，專門用來放置區塊的程式碼或檔案。在 blocks 目錄下，有二個子目錄： modules 和 views。modules 子目錄就是專門用來放區塊的本地模組之用，而 views 子目錄則儲存了各個區塊的 view (HTML, CSS, etc) 和 controller (JS)。如果一個區塊的網址路徑是 foo/example，那麼本地模組的程式檔應該是： blocks/modules/foo/example.js。</p>
+
+<h4>遠端服務</h4>
+<p>許多網路應用所需要的後端功能（包含各種資料的儲存與管理）是共同或重疊的，開發者不一定每次都要重新再造一次輪子。利用現有的 API 服務如 <a href="http://tw.coimotion.com">COIMOTION API</a>，可以節省開發者許多寶貴的時間。coServ 有內建對 COIMOTION API 的支援，開發者只需要在 siteURI.json 檔中標示區塊所要讀取資料的 API 端點 (endpoint)，coServ 就會自動到對應的 endpoint 去讀取資料。以下是一個 siteURI.json 的範例：</p>
+
+<pre><code>{
+    "index": {
+        "id": "no",
+        "service": "/myData/myPage/list"
+    }
+}</code></pre>
+
+<p>其中 index 是一個區塊的名稱，id 設成 no 表示這個區塊不需要識別碼，而 service 屬性就是用來告訴 coServ 到哪裡去為 index 這個區塊讀取資料。在上面的範例中，coServ 將會到 http://[my_app]/coimapi.tw/myData/myPage/list 的 API 端點 (endpoint) 去讀資料。</p>
+
+<p>如果你的網站是透過 COIMOTION 來讀取資料，那麼你必須先到 COIMOTION 上將你的網站登記成一個 App，同時為你的網站取一個被程式呼叫時的代碼（稱為 caCode)。另外 COIMOTION 也會為你的網站產生一個程式金鑰 (appKey)，來保護你的網站資料不被不當的使用或存取。你可以將應用代碼 (caCode) 和程式金鑰 (appKey) 記錄在 sites.json 檔案中，coServ 就能根據這些資訊來和 COIMOTION 對談。以下是 sites.json 的範例：</p>
+
+<pre><code>{
+    "www.foo.com": {
+        "title": "A Test WebSite",
+        "appKeys": {
+            "fooApp": "the_app_key_of_fooApp"
+        },
+        "caCode": "fooApp"
+    }
+}</code></pre>
+<p>就這麼簡單就能利用 COIMOTION 來為你的網站提供後端服務了。</p>
+<p>&nbsp;</p>
+
+
+
+<h3>更多文件</h3>
+<ul>
+    <li><a href="./index.html">開箱文</a></li>
+    <li><a href="./structure.html">網站的檔案結構</a></li>
+    <li><a href="./layout.html">coServ 的設計美學</a></li>
+    <li><a href="./blocks.html">神奇的區塊</a></li>
+    <li><a href="./jass.html">JASS</a></li>
+    <li><a href="./relocate_www.html">可重定位的 WWW 目錄</a></li>
+</ul>
+
+</section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+
+
+  </body>
+</html>
